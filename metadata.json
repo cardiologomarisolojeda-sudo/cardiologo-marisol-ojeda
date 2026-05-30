@@ -1,0 +1,8 @@
+{
+  "name": "Consultorio Dra. Marisol Ojeda",
+  "description": "Sistema integrado de reserva de citas y gestión clínica cardiológica con cifrado avanzado y sincronización.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

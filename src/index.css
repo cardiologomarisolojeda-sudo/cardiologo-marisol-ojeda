@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;750;800&family=Space+Grotesk:wght@400;550;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+}
+
+/* Base cardiology grid theme simulating medical EKG graph paper in deep dark mode with glowing red accents */
+html, body, #root, .bg-cardiology-app {
+  background-color: #04050a !important;
+  background-image: 
+    linear-gradient(rgba(239, 68, 68, 0.05) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, rgba(239, 68, 68, 0.05) 1.5px, transparent 1.5px),
+    linear-gradient(rgba(239, 68, 68, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(239, 68, 68, 0.015) 1px, transparent 1px) !important;
+  background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px !important;
+  background-position: center !important;
+  background-attachment: fixed !important;
+}
+
+/* Enforce ultra-vibrant pure white text universally for all typographic/alphabetic text elements */
+body, p, span, h1, h2, h3, h4, h5, h6, strong, li, a, label, input, select, textarea, button, td, th, div {
+  color: #ffffff !important;
+}
+
+

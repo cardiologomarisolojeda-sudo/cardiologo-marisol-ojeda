@@ -1,0 +1,119 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Reuseable global helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidPatient(data) {
+      return data.keys().hasAll(['id', 'name', 'phone', 'email', 'dob', 'createdAt'])
+        && data.keys().size() == 6
+        && data.id is string && data.id.size() <= 128
+        && data.name is string && data.name.size() <= 200
+        && data.phone is string && data.phone.size() <= 32
+        && data.email is string && data.email.size() <= 200
+        && data.dob is string && data.dob.size() <= 64
+        && data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    function isValidAppointment(data) {
+      return data.keys().hasAll(['id', 'patientId', 'patientName', 'patientPhone', 'date', 'time', 'reason', 'status', 'isOnline', 'price', 'createdAt'])
+        && data.keys().size() == 11
+        && data.id is string && data.id.size() <= 128
+        && data.patientId is string && data.patientId.size() <= 128
+        && data.patientName is string && data.patientName.size() <= 200
+        && data.patientPhone is string && data.patientPhone.size() <= 32
+        && data.date is string && data.date.size() <= 64
+        && data.time is string && data.time.size() <= 64
+        && data.reason is string && data.reason.size() <= 1000
+        && data.status is string && data.status in ['pending', 'confirmed', 'cancelled']
+        && data.isOnline is bool
+        && data.price is number
+        && data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    function isValidRecord(data) {
+      return data.keys().hasAll(['id', 'patientId', 'date', 'symptoms', 'diagnosis', 'treatment', 'bloodPressure', 'heartRate', 'electrocardiogramNotes', 'createdAt'])
+        && data.keys().size() == 10
+        && data.id is string && data.id.size() <= 128
+        && data.patientId is string && data.patientId.size() <= 128
+        && data.date is string && data.date.size() <= 64
+        && data.symptoms is string && data.symptoms.size() <= 20000
+        && data.diagnosis is string && data.diagnosis.size() <= 20000
+        && data.treatment is string && data.treatment.size() <= 20000
+        && data.bloodPressure is string && data.bloodPressure.size() <= 128
+        && data.heartRate is number
+        && data.electrocardiogramNotes is string && data.electrocardiogramNotes.size() <= 20000
+        && data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    function isValidClinicConfig(data) {
+      return data.keys().hasAll(['consultationPrice', 'whatsappNumber', 'onlineConsultationEnabled', 'workingHours', 'adminPin', 'masterPassword'])
+        && data.keys().size() == 6
+        && data.consultationPrice is number
+        && data.whatsappNumber is string && data.whatsappNumber.size() <= 32
+        && data.onlineConsultationEnabled is bool
+        && data.workingHours is map
+        && data.adminPin is string && data.adminPin.size() <= 64
+        && data.masterPassword is string && data.masterPassword.size() <= 200;
+    }
+
+    function isValidNotification(data) {
+      return data.keys().hasAll(['id', 'appointmentId', 'patientName', 'dateTimeStr', 'type', 'message', 'read', 'createdAt'])
+        && data.keys().size() == 8
+        && data.id is string && data.id.size() <= 128
+        && data.appointmentId is string && data.appointmentId.size() <= 128
+        && data.patientName is string && data.patientName.size() <= 200
+        && data.dateTimeStr is string && data.dateTimeStr.size() <= 128
+        && data.type is string && data.type in ['pending', 'system']
+        && data.message is string && data.message.size() <= 1000
+        && data.read is bool
+        && data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    // Clinic config document rules
+    match /clinic/config {
+      allow read: if true;
+      allow write: if isValidClinicConfig(request.resource.data);
+    }
+
+    // Patients collection rules
+    match /patients/{patientId} {
+      allow read: if true;
+      allow create: if isValidId(patientId) && isValidPatient(request.resource.data);
+      allow update: if isValidId(patientId) && isValidPatient(request.resource.data);
+    }
+
+    // Appointments collection rules
+    match /appointments/{appointmentId} {
+      allow read: if true;
+      allow create: if isValidId(appointmentId) && isValidAppointment(request.resource.data);
+      allow update: if isValidId(appointmentId) && isValidAppointment(request.resource.data);
+    }
+
+    // Medical records collection rules
+    match /records/{recordId} {
+      allow read: if true;
+      allow create: if isValidId(recordId) && isValidRecord(request.resource.data);
+      allow update: if isValidId(recordId) && isValidRecord(request.resource.data);
+    }
+
+    // Notifications collection rules
+    match /notifications/{notificationId} {
+      allow read: if true;
+      allow create: if isValidId(notificationId) && isValidNotification(request.resource.data);
+      allow update: if isValidId(notificationId) && isValidNotification(request.resource.data);
+    }
+  }
+}

@@ -1,0 +1,146 @@
+{
+  "entities": {
+    "Patient": {
+      "title": "Patient",
+      "description": "Ficha básica de identificación del paciente",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "dob": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "phone", "email", "dob", "createdAt"]
+    },
+    "Appointment": {
+      "title": "Appointment",
+      "description": "Cita cardiológica del paciente en consultorio o teleconsulta",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "patientId": { "type": "string" },
+        "patientName": { "type": "string" },
+        "patientPhone": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "reason": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "cancelled"] },
+        "isOnline": { "type": "boolean" },
+        "price": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "id",
+        "patientId",
+        "patientName",
+        "patientPhone",
+        "date",
+        "time",
+        "reason",
+        "status",
+        "isOnline",
+        "price",
+        "createdAt"
+      ]
+    },
+    "MedicalRecord": {
+      "title": "MedicalRecord",
+      "description": "Expediente médico cardiológico encriptado localmente (P-Q-R-S-T / E2E)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "patientId": { "type": "string" },
+        "date": { "type": "string" },
+        "symptoms": { "type": "string" },
+        "diagnosis": { "type": "string" },
+        "treatment": { "type": "string" },
+        "bloodPressure": { "type": "string" },
+        "heartRate": { "type": "number" },
+        "electrocardiogramNotes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "id",
+        "patientId",
+        "date",
+        "symptoms",
+        "diagnosis",
+        "treatment",
+        "bloodPressure",
+        "heartRate",
+        "electrocardiogramNotes",
+        "createdAt"
+      ]
+    },
+    "ClinicConfig": {
+      "title": "ClinicConfig",
+      "description": "Configuración global de la clínica y horarios",
+      "type": "object",
+      "properties": {
+        "consultationPrice": { "type": "number" },
+        "whatsappNumber": { "type": "string" },
+        "onlineConsultationEnabled": { "type": "boolean" },
+        "workingHours": { "type": "object" },
+        "adminPin": { "type": "string" },
+        "masterPassword": { "type": "string" }
+      },
+      "required": [
+        "consultationPrice",
+        "whatsappNumber",
+        "onlineConsultationEnabled",
+        "workingHours",
+        "adminPin",
+        "masterPassword"
+      ]
+    },
+    "ClinicNotification": {
+      "title": "ClinicNotification",
+      "description": "Notificaciones para el panel del doctor",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "appointmentId": { "type": "string" },
+        "patientName": { "type": "string" },
+        "dateTimeStr": { "type": "string" },
+        "type": { "type": "string", "enum": ["pending", "system"] },
+        "message": { "type": "string" },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "id",
+        "appointmentId",
+        "patientName",
+        "dateTimeStr",
+        "type",
+        "message",
+        "read",
+        "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/clinic/config": {
+      "schema": "ClinicConfig",
+      "description": "Documento unificado con la configuración del consultorio de la Dra. Marisol Ojeda"
+    },
+    "/patients/{patientId}": {
+      "schema": "Patient",
+      "description": "Fichas de pacientes indexados"
+    },
+    "/appointments/{appointmentId}": {
+      "schema": "Appointment",
+      "description": "Reservaciones de consultas de los pacientes"
+    },
+    "/records/{recordId}": {
+      "schema": "MedicalRecord",
+      "description": "Expedientes clínicos y hallazgos encriptados E2E"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "ClinicNotification",
+      "description": "Notificaciones de alertas de la clínica para el panel médico"
+    }
+  }
+}
